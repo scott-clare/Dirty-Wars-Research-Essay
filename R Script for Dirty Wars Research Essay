@@ -22,11 +22,12 @@ cor_mat <- cor(PTS_ind)
 
 # Perform fixed effects linear regression
 lmodel <- plm(PTS_S ~ growth+ineq+polity+polity_sq+logpop+rev_war+eth_war+logmilitary+FDI+durable+factor(year), 
-index = 'ID', 
-model = 'within', 
-data = PTS_Data)
-summary(lmodel)
+              index = 'ID', 
+              model = 'within', 
+              data = PTS_Data)
+              summary(lmodel)
 
 # Perform lowess regression
-lowess_reg <- lowess(PTS_S ~ polity, data = PTS_Data)
+lowess_reg <- lowess(PTS_S ~ polity, 
+                     data = PTS_Data)
 plot(lowess_reg)
