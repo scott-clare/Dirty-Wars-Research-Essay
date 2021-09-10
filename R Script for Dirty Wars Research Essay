@@ -1,0 +1,32 @@
+library(dplyr)
+library(readxl)
+library(plm)
+library(gplots)
+
+# Import Data
+PTS_Data <- read_excel("/Users/scottclare/Desktop/MA Intelligence and International Security/Dirty Wars/Research Puzzle Excel Files/Research Puzzle Dataset 1992-2010_NEW.xlsx")
+
+# Select Vars
+PTS_Data <- PTS_Data %>% select(c('ID', 'Country', 'PTS_S', "year", "growth", "ineq", "military", "polity",  "polity_sq", "polity+10", 'logpop', 'rev_war', 'eth_war', 'logmilitary', 'youth_pop%', 'FDI', 'durable'))
+
+# Convert Dependent Var to Numeric
+PTS_Data$PTS_S <- as.numeric(PTS_Data$PTS_S)
+
+# Remove Missing Values
+PTS_Data <- na.omit(PTS_Data)
+
+# Identify collinearity with correlation matrix
+ind_vars <- c("growth", "ineq", "polity",  "polity_sq", 'logpop', 'rev_war', 'eth_war', 'logmilitary', 'youth_pop%', 'FDI', 'durable')
+PTS_ind <- PTS_Data %>% select(all_of(ind_vars))
+cor_mat <- cor(PTS_ind)
+
+# Perform fixed effects linear regression
+lmodel <- plm(PTS_S ~ growth+ineq+polity+polity_sq+logpop+rev_war+eth_war+logmilitary+FDI+durable+factor(year), 
+index = 'ID', 
+model = 'within', 
+data = PTS_Data)
+summary(lmodel)
+
+# Perform lowess regression
+lowess_reg <- lowess(PTS_S ~ polity, data = PTS_Data)
+plot(lowess_reg)
